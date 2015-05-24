@@ -103,27 +103,53 @@
 (defn simple-example
   []
   [:div
-   [greeting "Reagent Time: It is now"]
+   [greeting "Reagent: Normal."]
    [clock]
    [color-input]])
 
 
-;; -- Angular Module + Test Controller
+;; -- Angular Module + Test Controllers
 
 (def.module angularTest [])
 
-(def.controller angularTest.TestCtrl [$scope $timeout]
+(def.controller angularTest.AngularWatchCtrl [$scope $timeout]
 
-                ; $scope vars
+                ;; $scope vars
                 (! $scope.timeStr "")
                 (! $scope.timeColor "#f34")
 
-                ; $scope functions
+                ;; $scope functions
                 (! $scope.changeColor (fn []
                                         (dispatch
                                           [:time-color $scope.timeColor])))
 
-                ;; Watch the time and update the scope on change
+                ;; Setup re-frame subscriptions
+                (def time-color (subscribe [:time-color]))
+                (def timer (subscribe [:timer]))
+
+                ;; Have angular watch the reactions for changes and update the scope variables
+                ($scope.$watch (fn [] @timer)
+                               (fn [newValue oldValue]
+                                        (! $scope.timeStr (-> @timer
+                                                              .toTimeString
+                                                              (clojure.string/split " ")
+                                                              first))))
+                ($scope.$watch (fn [] @time-color)
+                               (fn [newValue oldValue]
+                                             (! $scope.timeColor @time-color))))
+
+(def.controller angularTest.AngularWatchAppDBCtrl [$scope $timeout]
+
+                ;; $scope vars
+                (! $scope.timeStr "")
+                (! $scope.timeColor "#f34")
+
+                ;; $scope functions
+                (! $scope.changeColor (fn []
+                                        (dispatch
+                                          [:time-color $scope.timeColor])))
+
+                ; Directly watch app-db and update the scope on change
                 (defn set-timer [timer]
                   ($timeout (fn []
                               (! $scope.timeStr (-> timer
@@ -142,8 +168,6 @@
                 (add-watch app-db [:time-color]
                            (fn [key atom old-state new-state]
                              (set-color (get-in new-state [:time-color])))))
-
-
 
 
 ;; -- Entry Point -------------------------------------------------------------

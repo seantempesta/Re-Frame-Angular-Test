@@ -1,5 +1,5 @@
 
-(defproject simple-re-frame "0.4.0"
+(defproject angular-re-frame "0.4.0"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-3208"]
                  [reagent "0.5.0"]
@@ -27,7 +27,7 @@
                                         :elide-asserts true
                                         :pretty-print false}}}}}}
 
-  :figwheel {:repl false}
+  :figwheel {:repl true}
 
   :cljsbuild {:builds {:client {:source-paths ["src"]
                                 :compiler
