@@ -130,13 +130,15 @@
                 ;; Have angular watch the reactions for changes and update the scope variables
                 ($scope.$watch (fn [] @timer)
                                (fn [newValue oldValue]
-                                        (! $scope.timeStr (-> @timer
+                                 (when newValue
+                                        (! $scope.timeStr (-> newValue
                                                               .toTimeString
                                                               (clojure.string/split " ")
-                                                              first))))
+                                                              first)))))
                 ($scope.$watch (fn [] @time-color)
                                (fn [newValue oldValue]
-                                             (! $scope.timeColor @time-color))))
+                                 (when newValue
+                                             (! $scope.timeColor newValue)))))
 
 (def.controller angularTest.AngularWatchAppDBCtrl [$scope $timeout]
 
