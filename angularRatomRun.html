@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Example</title>
+    <link rel="stylesheet" href="example.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+</head>
+
+<body>
+<div ng-app="angularTest">
+
+    <!-- angular watching app-db version -->
+    <div ng-controller="AngularRatomRun">
+
+        <div id="angular-app">
+            <h1>Angular: Using Ratom/Run!</h1>
+            <div id="angular-example-clock" class="example-clock" style="color: {{timeColor}}">{{timeStr}}</div>
+            <div class="color-input">
+                <span>Time color: </span>
+                <input type="text" ng-model="timeColor" ng-change="changeColor()">
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- reagent version -->
+<div id="reagent-app" style="display:none;"></div>
+<script src="target/client.js"></script>
+<script>
+        window.onload = function () {
+            angularexample.core.run();
+        }
+    </script>
+</body>
+</html>

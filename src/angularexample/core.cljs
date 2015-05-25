@@ -152,24 +152,52 @@
                                           [:time-color $scope.timeColor])))
 
                 ; Directly watch app-db and update the scope on change
+                (add-watch app-db [:timer]
+                           (fn [key atom old-state new-state]
+                             ($timeout (fn []
+                                         (! $scope.timeStr (-> (get-in new-state [:timer])
+                                                               .toTimeString
+                                                               (clojure.string/split " ")
+                                                               first))))))
+
+                ;; Watch the time color and update the scope on change
+                (add-watch app-db [:time-color]
+                           (fn [key atom old-state new-state]
+                             ($timeout (fn []
+                                         (! $scope.timeColor (get-in new-state [:time-color])))))))
+
+(def.controller angularTest.AngularRatomRun [$scope $timeout]
+
+                ;; $scope vars
+                (! $scope.timeStr "")
+                (! $scope.timeColor "#f34")
+
+                ;; $scope functions
+                (! $scope.changeColor (fn []
+                                        (dispatch
+                                          [:time-color $scope.timeColor])))
+
+                ;; Functions to update the Angular scope vars
                 (defn set-timer [timer]
                   ($timeout (fn []
                               (! $scope.timeStr (-> timer
                                                     .toTimeString
                                                     (clojure.string/split " ")
                                                     first)))))
-                (add-watch app-db [:timer]
-                           (fn [key atom old-state new-state]
-                             (set-timer (get-in new-state [:timer]))))
 
-                ;; Watch the time color and update the scope on change
                 (defn set-color [color]
                   ($timeout (fn []
                               (! $scope.timeColor color))))
 
-                (add-watch app-db [:time-color]
-                           (fn [key atom old-state new-state]
-                             (set-color (get-in new-state [:time-color])))))
+                ;; Setup re-frame subscriptions using ratom/run!
+                (let [timer (subscribe [:timer])]
+                  (reagent.ratom/run!
+                    (set-timer @timer)))
+
+                (let [time-color (subscribe [:time-color])]
+                  (reagent.ratom/run!
+                    (set-color @time-color)))
+)
 
 
 ;; -- Entry Point -------------------------------------------------------------
